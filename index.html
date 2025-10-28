@@ -275,19 +275,19 @@ bookingForm.addEventListener('submit', async (ev)=>{
   let failedSeats = [];
 
   for(const seat of seatsArray){
-    const [k,tm,st] = seat.split('-'); // k like "A", tm like "T1", st like "S2"
-    const payload = {
-      nama: name,
-      telefon: phone,
-      batch: batch,
-      resit: resit,
-      khemah: k,
-      meja: tm.replace('T',''),
-      kerusi: st.replace('S',''),
-      kod_tempahan: code,
-      harga: PRICE,
-      masa: new Date().toISOString()
-    };
+const [khemah, mejaStr, kerusiStr] = seat.split('-');
+const payload = {
+  nama: name,
+  telefon: phone,
+  batch: batch,
+  resit: resit,
+  khemah: khemah.replace('T','').replace('S',''),
+  meja: mejaStr.replace('T',''),
+  kerusi: kerusiStr.replace('S',''),
+  kod_tempahan: code,
+  harga: PRICE,
+  masa: new Date().toISOString()
+};
 
     try{
       // send as GET query to avoid CORS restrictions
@@ -349,4 +349,5 @@ document.addEventListener('DOMContentLoaded', buildLayout);
 </script>
 </body>
 </html>
+
 
