@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tempahan_STS100A (v2) — Majlis 100 Tahun STS</title>
+<style>
+  :root{
+    --header:#0f3b77; --bg:#f7f9fc; --seat-size:32px; --price:180;
+    --booked:#bdbdbd; --selected:#2ecc71;
+    --vvip:#fdf3d7; --vvip-border:#fcd34d;
+  }
+  *{box-sizing:border-box;font-family:Inter,system-ui,Arial,Helvetica,sans-serif}
+  body{margin:0;background:var(--bg);color:#0f172a}
+  header{background:var(--header);color:#fff;display:flex;align-items:center;gap:12px;padding:12px 18px;justify-content:space-between}
+  header img{height:72px;width:auto}
+  .header-center{flex:1;text-align:center}
+  .header-center h1{margin:4px 0;font-size:18px}
+  .header-center p{margin:0;font-size:13px;opacity:.95}
+  main{max-width:1200px;margin:16px auto;padding:12px}
+  .note{max-width:1200px;margin:0 auto 12px;padding:0 12px;color:#374151}
+  .legend{display:flex;gap:12px;align-items:center;margin-bottom:12px;max-width:1200px;margin-left:auto;margin-right:auto}
+  .legend span{display:inline-flex;align-items:center;gap:8px}
+  .tents-layout{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;justify-items:center;align-items:start;max-width:1200px;margin:14px auto}
+  .tent{width:260px;padding:12px;border-radius:10px;position:relative;min-height:240px;display:flex;flex-direction:column;align-items:center}
+  .tent-name{font-weight:700;text-align:center;margin-bottom:8px}
+  .tent-inner{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;justify-items:center;align-content:center}
+  /* pastel tents + border */
+  .tent-A{background:#d1fae5;border:4px solid #34d399}
+  .tent-B{background:#dbeafe;border:4px solid #3b82f6}
+  .tent-D{background:#ede9fe;border:4px solid #8b5cf6}
+  .tent-E{background:#fef9c3;border:4px solid #eab308}
+  .tent-F{background:#ffe4e6;border:4px solid #f43f5e}
+  .tent-G{background:#cffafe;border:4px solid #06b6d4}
+  .tent-H{background:#dcfce7;border:4px solid #22c55e}
+  .tent-I{background:#f1f5f9;border:4px solid #94a3b8}
+  .tent-J{background:#fff3f0;border:4px solid #fb923c}
+  /* VVIP C */
+  .tent-C{background:var(--vvip);border:4px solid var(--vvip-border);display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .vvip-note{font-weight:700;color:#92400e;text-align:center}
+  .vvip-sub{font-size:13px;color:#7c2d12;margin-top:6px;text-align:center}
+  .table-card{position:relative;width:100px;height:100px;border-radius:50%;background:#f9fafb;border:2px solid #e2e8f0;display:flex;align-items:center;justify-content:center}
+  .table-center{width:30px;height:30px;border-radius:50%;background:#fff;border:1px solid #cbd5e1;display:flex;align-items:center;justify-content:center;font-size:11px}
+  .seat{position:absolute;width:var(--seat-size);height:var(--seat-size);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;border:1px solid #dbeafe;background:#fff;cursor:pointer;user-select:none}
+  .seat.booked{background:var(--booked);color:#fff;cursor:not-allowed}
+  .seat.selected{background:var(--selected);color:#fff}
+  .controls{display:flex;gap:10px;align-items:center;justify-content:center;margin:12px 0;flex-wrap:wrap}
+  button.primary{background:var(--header);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
+  button.ghost{background:#fff;border:1px solid #e6eefc;color:var(--header);padding:9px 12px;border-radius:8px;cursor:pointer}
+  /* modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;z-index:60}
+  .modal{width:520px;background:#fff;border-radius:10px;padding:16px;box-shadow:0 10px 40px rgba(2,6,23,.3)}
+  .modal h3{margin:0 0 8px;font-size:18px}
+  .field{margin-bottom:10px}
+  label{display:block;font-size:13px;margin-bottom:6px}
+  input,textarea,select{width:100%;padding:8px;border-radius:8px;border:1px solid #e6eefc}
+  .small{font-size:13px;color:#475569}
+  footer{background:var(--header);color:#fff;text-align:center;padding:12px;margin-top:18px}
+  @media(max-width:960px){ .tents-layout{grid-template-columns:repeat(2,1fr)} header img{height:56px} .modal{width:92%} .tent{width:90%} }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo_sts.png" alt="Logo STS" onerror="this.style.display='none'">
+  <div class="header-center">
+    <h1>Tempahan STS100A — Majlis 100 Tahun (1926–2026)</h1>
+    <p>Hubungi Alumni STS: 07-9312472</p>
+  </div>
+  <img src="logo_100yrs.png" alt="100 Tahun STS" onerror="this.style.display='none'">
+</header>
+
+<main>
+  <div class="note">Sila pilih kerusi yang kosong. Harga RM180/kerusi. Khemah C ditandakan VVIP — <strong>tidak menerima tempahan</strong>.</div>
+
+  <div class="controls">
+    <button class="primary" id="openBookingBtn">Buka Borang Tempahan</button>
+    <button class="ghost" id="downloadAllBtn">💾 Muat Turun Semua Tempahan (CSV)</button>
+    <button class="ghost" id="exportLocalBtn">📥 Eksport Semua (Local CSV)</button>
+    <button class="ghost" id="adminViewBtn">🔒 Paparan Admin</button>
+  </div>
+
+  <div class="legend">
+    <span><span style="display:inline-block;width:16px;height:16px;border-radius:4px;background:#fff;border:1px solid #dbeafe"></span> Kosong</span>
+    <span><span style="display:inline-block;width:16px;height:16px;border-radius:4px;background:var(--selected)"></span> Dipilih</span>
+    <span><span style="display:inline-block;width:16px;height:16px;border-radius:4px;background:var(--booked)"></span> Telah Ditempah</span>
+    <span><span style="display:inline-block;width:16px;height:16px;border-radius:4px;background:var(--vvip);border:2px solid var(--vvip-border)"></span> Khemah C (VVIP)</span>
+  </div>
+
+  <div class="tents-layout" id="tentsContainer"></div>
+</main>
+
+<!-- Booking modal -->
+<div class="modal-backdrop" id="bookingBackdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="bookingTitle">
+    <h3 id="bookingTitle">Borang Tempahan</h3>
+    <form id="bookingForm">
+      <div class="field"><label>Nama Penuh</label><input id="fName" required></div>
+      <div class="field"><label>No. Telefon</label><input id="fPhone" required></div>
+      <div class="field"><label>Batch / Tahun</label><input id="fBatch" required></div>
+      <div class="field"><label>No. Resit / Rujukan (jika ada)</label><input id="fResit"></div>
+      <div class="field small" id="selectedSummary">Tiada kerusi dipilih.</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+        <button type="button" class="ghost" id="bookingCancel">Batal</button>
+        <button type="submit" class="primary" id="confirmBtn">Sahkan Tempahan & Hantar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Admin modal -->
+<div class="modal-backdrop" id="adminBackdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <h3 id="adminTitle">Paparan Admin</h3>
+    <div class="field">
+      <label>Kata Laluan Admin</label>
+      <input id="adminPass" type="password" placeholder="Masukkan kata laluan">
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="ghost" id="adminCancel">Tutup</button>
+      <button class="primary" id="adminLogin">Log Masuk</button>
+    </div>
+    <p class="small" style="margin-top:8px">(Kata laluan admin: <strong>STSADMIN2025</strong>)</p>
+  </div>
+</div>
+
+<footer>© 2026 Sekolah Tinggi Segamat — Tempahan STS100A</footer>
+
+<script>
+/* ----------------- CONFIG ----------------- */
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyUVJJcwRbILCFBaFkpkk_0OHJVozspeS4Es6GtHhmNqS0RRw4Jr4ggSr5lBdffsQSOmg/exec';
+const STORAGE_BOOKINGS = 'Tempahan_STS100A_bookings_v2';
+const ADMIN_PASS = 'STSADMIN2025';
+const PRICE = 180;
+const MEJA_PER_KHEMAH = 4;
+const SEATS_PER_TABLE = 8;
+// final layout where C is VVIP without seats/tables:
+const tentMap = [['A','B','C','D','E'], ['F','G','H','I','J']];
+
+/* tiny helpers */
+const $ = (s,ctx=document)=>ctx.querySelector(s);
+const $all = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
+
+function loadBookings(){ try{ return JSON.parse(localStorage.getItem(STORAGE_BOOKINGS))||[] }catch{return[]} }
+function saveBookings(b){ localStorage.setItem(STORAGE_BOOKINGS, JSON.stringify(b)) }
+
+/* Build layout */
+const tentsContainer = $('#tentsContainer');
+let selectedSeats = new Set();
+
+function buildLayout(){
+  tentsContainer.innerHTML = '';
+  const bookings = loadBookings();
+  const bookedSet = new Set(bookings.flatMap(b=>b.seats));
+  for(const row of tentMap){
+    for(const tName of row){
+      const tent = document.createElement('div');
+      // handle empty or VVIP C specially
+      if(tName === 'C'){
+        tent.className = 'tent tent-C';
+        tent.innerHTML = `<div class="tent-name">Khemah ${tName} <span style="font-weight:600;color:#92400e">(VVIP)</span></div>
+                          <div class="vvip-note">Kawasan Tetamu Kehormat</div>
+                          <div class="vvip-sub">Tanpa meja / kerusi — Tiada tempahan</div>`;
+        tentsContainer.appendChild(tent);
+        continue;
+      }
+      tent.className = 'tent tent-' + tName;
+      tent.innerHTML = `<div class="tent-name">Khemah ${tName}</div><div class="tent-inner"></div>`;
+      const inner = tent.querySelector('.tent-inner');
+      for(let m=1;m<=MEJA_PER_KHEMAH;m++){
+        const table = document.createElement('div'); table.className='table-card';
+        const center = document.createElement('div'); center.className='table-center'; center.textContent='T'+m; table.appendChild(center);
+        const radius = 35;
+        for(let s=1;s<=SEATS_PER_TABLE;s++){
+          const seatId = `${tName}-T${m}-S${s}`;
+          const angle = (s-1)*(360/SEATS_PER_TABLE)*Math.PI/180;
+          const x = 50 + radius*Math.cos(angle);
+          const y = 50 + radius*Math.sin(angle);
+          const seat = document.createElement('div');
+          const isBooked = bookedSet.has(seatId);
+          seat.className = 'seat' + (isBooked? ' booked' : '');
+          seat.style.left = x + 'px'; seat.style.top = y + 'px';
+          const short = `${tName}${m}${s}`; // e.g. B35
+          seat.textContent = short;
+          seat.title = `Khemah ${tName} — Meja ${m} — Kerusi ${s}`;
+          seat.dataset.seatid = seatId;
+          seat.dataset.short = short;
+          seat.addEventListener('click', onSeatClick);
+          table.appendChild(seat);
+        }
+        inner.appendChild(table);
+      }
+      tentsContainer.appendChild(tent);
+    }
+  }
+  updateSelectedSummary();
+}
+
+/* Seat click toggles selection (if not booked) */
+function onSeatClick(e){
+  const el = e.currentTarget;
+  if(el.classList.contains('booked')){ alert(`Maaf, ${el.dataset.seatid} telah ditempah.`); return; }
+  const id = el.dataset.seatid;
+  if(selectedSeats.has(id)){ selectedSeats.delete(id); el.classList.remove('selected'); }
+  else { selectedSeats.add(id); el.classList.add('selected'); }
+  updateSelectedSummary();
+}
+
+function updateSelectedSummary(){
+  const el = $('#selectedSummary');
+  if(!el) return;
+  if(selectedSeats.size===0) el.textContent = 'Tiada kerusi dipilih.';
+  else el.textContent = `Kerusi dipilih: ${Array.from(selectedSeats).join(', ')} — Jumlah RM${selectedSeats.size * PRICE}`;
+}
+
+/* ---------- Booking modal handling ---------- */
+const bookingBackdrop = $('#bookingBackdrop');
+const bookingForm = $('#bookingForm');
+$('#openBookingBtn').addEventListener('click', ()=> { bookingBackdrop.style.display='flex'; $('#fName').focus(); updateSelectedSummary(); });
+$('#bookingCancel').addEventListener('click', ()=> { bookingBackdrop.style.display='none'; });
+
+bookingForm.addEventListener('submit', async (ev)=>{
+  ev.preventDefault();
+  if(selectedSeats.size===0){ alert('Sila pilih sekurang-kurangnya satu kerusi terlebih dahulu.'); return; }
+  const name = $('#fName').value.trim();
+  const phone = $('#fPhone').value.trim();
+  const batch = $('#fBatch').value.trim();
+  const resit = $('#fResit').value.trim() || '';
+  if(!name||!phone||!batch){ alert('Sila lengkapkan Nama, Telefon dan Batch.'); return; }
+
+  const seatsArray = Array.from(selectedSeats);
+  const code = 'STS100-' + Math.random().toString(36).slice(2,9).toUpperCase();
+
+  // We'll attempt to POST each seat to Google Apps Script; only mark as booked when server returns OK.
+  let successSeats = [];
+  let failedSeats = [];
+
+  for(const seat of seatsArray){
+    const [k,m,s] = seat.split('-'); // k like "A", m like "T1", s like "S2"
+    const payload = {
+      nama: name,
+      telefon: phone,
+      batch: batch,
+      resit: resit,
+      khemah: k,
+      meja: m.replace('T',''),
+      kerusi: s.replace('S',''),
+      kod_tempahan: code,
+      harga: PRICE,
+      masa: new Date().toISOString()
+    };
+    try{
+      const resp = await fetch(WEBAPP_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const txt = (await resp.text()).trim();
+      if(txt === 'OK'){
+        successSeats.push(seat);
+      } else if(txt === 'DUPLICATE'){
+        failedSeats.push({seat, reason: 'DUPLICATE'});
+        alert(`⚠️ Maaf, ${seat} telah ditempah oleh pengguna lain. Sila pilih tempat duduk lain.`);
+        // remove seat from current selection visually
+        selectedSeats.delete(seat);
+      } else {
+        failedSeats.push({seat, reason: 'UNKNOWN', resp: txt});
+        console.warn('Unexpected response for', seat, txt);
+      }
+    } catch(err){
+      failedSeats.push({seat, reason: 'NETWORK', err});
+      console.error('Network error sending', seat, err);
+    }
+  }
+
+  // If we have at least one successful seat, save booking locally (group as one booking record)
+  if(successSeats.length>0){
+    const booking = {
+      code,
+      name, phone, batch, resit,
+      seats: successSeats,
+      total: successSeats.length * PRICE,
+      createdAt: new Date().toISOString()
+    };
+    const all = loadBookings();
+    all.push(booking);
+    saveBookings(all);
+  }
+
+  // rebuild UI to reflect bookings (booked seats will show as booked from loadBookings)
+  selectedSeats.clear();
+  $('#fName').value=''; $('#fPhone').value=''; $('#fBatch').value=''; $('#fResit').value='';
+  bookingBackdrop.style.display='none';
+  buildLayout();
+
+  // notify user
+  if(successSeats.length>0 && failedSeats.length===0){
+    alert(`✅ Tempahan berjaya untuk ${successSeats.length} kerusi. Kod: ${code}.`);
+  } else if(successSeats.length>0 && failedSeats.length>0){
+    alert(`✅ Sebahagian tempahan berjaya (${successSeats.length}). Sebahagian gagal (${failedSeats.length}). Sila semak paparan dan pilih tempat lain untuk kerusi yang gagal.`);
+  } else {
+    alert('⚠️ Gagal membuat tempahan ke pelayan. Tiada kerusi ditempah. Sila cuba lagi kemudian.');
+  }
+});
+
+/* ---------- Admin modal ---------- */
+const adminBackdrop = $('#adminBackdrop');
+$('#adminViewBtn').addEventListener('click', ()=>{ adminBackdrop.style.display='flex'; $('#adminPass').focus(); });
+$('#adminCancel').addEventListener('click', ()=>{ adminBackdrop.style.display='none'; $('#adminPass').value=''; });
+
+$('#adminLogin').addEventListener('click', ()=>{
+  const val = $('#adminPass').value;
+  if(val === ADMIN_PASS){
+    adminBackdrop.style.display='none'; $('#adminPass').value='';
+    const bookings = loadBookings();
+    if(bookings.length===0){ alert('Tiada tempahan.'); return; }
+    let msg = 'Ringkasan Tempahan:\\n';
+    bookings.forEach(b=>{
+      msg += `${b.code} — ${b.name} — ${b.batch} — ${b.seats.join(', ')} — RM${b.total}\\n`;
+    });
+    alert(msg);
+  } else { alert('Kata laluan admin salah.'); $('#adminPass').value=''; }
+});
+
+/* ---------- Download / Export ---------- */
+$('#downloadAllBtn').addEventListener('click', ()=>{
+  const bookings = loadBookings();
+  if(bookings.length===0){ alert('Tiada tempahan disimpan.'); return; }
+  const rows = [['Kod Tempahan','Nama','Telefon','Batch','Resit','Khemah','Meja','Kerusi','Harga','Tarikh']];
+  for(const b of bookings){
+    for(const seat of b.seats){
+      const [k,m,s] = seat.split('-');
+      rows.push([b.code,b.name,b.phone,b.batch,b.resit,k,m.replace('T',''),s.replace('S',''),(b.total / b.seats.length), b.createdAt]);
+    }
+  }
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'}); const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `Tempahan_STS100A_All.csv`; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 700);
+});
+
+$('#exportLocalBtn').addEventListener('click', ()=>{ $('#downloadAllBtn').click(); });
+
+/* ---------- Init ---------- */
+buildLayout();
+
+</script>
+</body>
+</html>
