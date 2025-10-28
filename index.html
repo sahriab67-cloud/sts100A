@@ -250,11 +250,19 @@ bookingForm.addEventListener('submit', async (ev)=>{
       masa: new Date().toISOString()
     };
     try{
-      const resp = await fetch(WEBAPP_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: { 'Content-Type': 'application/json' }
-      });
+// Hantar guna GET supaya tidak disekat oleh CORS
+const params = new URLSearchParams(payload);
+const resp = await fetch(WEBAPP_URL + "?" + params.toString(), { method: "GET" });
+const txt = await resp.text();
+
+if (txt.includes("OK")) {
+  alert("✅ Tempahan berjaya disimpan!");
+  tutupPopup();
+} else if (txt.includes("DUPLICATE")) {
+  alert("⚠️ Maaf, kerusi telah ditempah oleh pengguna lain.");
+} else {
+  alert("❌ Ralat sambungan: " + txt);
+}
       const txt = (await resp.text()).trim();
       if(txt === 'OK'){
         successSeats.push(seat);
@@ -347,6 +355,7 @@ buildLayout();
 </script>
 </body>
 </html>
+
 
 
 
