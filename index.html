@@ -281,12 +281,11 @@ const payload = {
   telefon: phone,
   batch: batch,
   resit: resit,
-  khemah: khemah.replace('T','').replace('S',''),
-  meja: mejaStr.replace('T',''),
-  kerusi: kerusiStr.replace('S',''),
+  khemah: k,
+  meja: m.replace('T',''),
+  kerusi: s.replace('S',''),
   kod_tempahan: code,
-  harga: PRICE,
-  masa: new Date().toISOString()
+  harga: PRICE
 };
 
     try{
@@ -350,6 +349,7 @@ document.addEventListener('DOMContentLoaded', buildLayout);
 </script>
 </body>
 </html>
+
 
 
 
