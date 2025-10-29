@@ -292,12 +292,10 @@ const payload = {
     try{
       // send as GET query to avoid CORS restrictions
 const params = new URLSearchParams(payload);
-const resp = await fetch(WEBAPP_URL + "?" + params.toString(), {
-  method: "GET",
-  mode: "no-cors",
-  cache: "no-cache"
-});
-  const txt = await resp.text();
+// Hantar data tanpa tunggu respon (supaya pelan tidak terganggu)
+fetch(WEBAPP_URL + "?" + params.toString(), { method: "GET" })
+  .then(() => console.log("Data sent to Apps Script:", seat))
+  .catch(err => console.error("Fetch error:", err));
       if(txt === 'OK' || txt.includes('OK')){
         successSeats.push(seat);
       } else if(txt === 'DUPLICATE' || txt.includes('DUPLICATE')){
@@ -352,6 +350,7 @@ document.addEventListener('DOMContentLoaded', buildLayout);
 </script>
 </body>
 </html>
+
 
 
 
