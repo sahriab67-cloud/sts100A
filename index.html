@@ -291,9 +291,11 @@ const payload = {
 
     try{
       // send as GET query to avoid CORS restrictions
-      const params = new URLSearchParams(payload);
-      const resp = await fetch(WEBAPP_URL + "?" + params.toString(), { method: "GET" });
-      const txt = (await resp.text()).trim();
+const params = new URLSearchParams(payload);
+const resp = await fetch(WEBAPP_URL + "?" + params.toString(), {
+  method: "GET",
+  mode: "no-cors",
+  cache: "no-cache"
 
       if(txt === 'OK' || txt.includes('OK')){
         successSeats.push(seat);
@@ -349,6 +351,7 @@ document.addEventListener('DOMContentLoaded', buildLayout);
 </script>
 </body>
 </html>
+
 
 
 
