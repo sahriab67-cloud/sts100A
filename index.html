@@ -297,6 +297,7 @@ const resp = await fetch(WEBAPP_URL + "?" + params.toString(), {
   mode: "no-cors",
   cache: "no-cache"
 });
+  const txt = await resp.text();
       if(txt === 'OK' || txt.includes('OK')){
         successSeats.push(seat);
       } else if(txt === 'DUPLICATE' || txt.includes('DUPLICATE')){
@@ -351,6 +352,7 @@ document.addEventListener('DOMContentLoaded', buildLayout);
 </script>
 </body>
 </html>
+
 
 
 
