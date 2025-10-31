@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Tempahan Pakej PLATINUM — Majlis 100 Tahun (v5)</title>
+<title>Tempahan_STS100A — Majlis 100 Tahun (v5)</title>
 <style>
   :root{
     --header:#0f3b77; --bg:#f7f9fc; --seat-size:32px; --price:180;
@@ -38,20 +38,8 @@
 
   /* table card inside tent */
   .table-slot{width:110px;height:110px;position:relative;border-radius:50%;background:#f9fafb;border:2px solid #e2e8f0;display:flex;align-items:center;justify-content:center}
-  .table-center {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #0f3b77;   /* 💙 warna biru gelap meja */
-  color: #fff;           /* ✳️ tulisan putih */
-  border: 1px solid #cbd5e1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  position: relative;
-  z-index: 2;
-}
+  .table-center{width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid #cbd5e1;display:flex;align-items:center;justify-content:center;font-size:12px;z-index:3}
+
   .seat{position:absolute;width:var(--seat-size);height:var(--seat-size);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;border:1px solid #3b82f6;background:#fff;color:#0f172a;cursor:pointer;user-select:none;transform:translate(-50%,-50%);z-index:2}
   .seat.booked{background:var(--booked);color:#fff;cursor:not-allowed}
   .seat.selected{background:var(--selected);color:#fff}
@@ -74,8 +62,8 @@
 <header>
   <img src="logo_sts.png" alt="Logo STS" onerror="this.style.display='none'">
   <div class="header-center">
-    <h1>Tempahan Pakej PLATINUM — Majlis 100 Tahun (1926–2026)</h1>
-    <p>Hubungi Urusetia Alumni STS: 011-55742917(Cg Azlan)/011-21441240(Cg Ajul)</p>
+    <h1>Tempahan STS100A — Majlis 100 Tahun (1926–2026)</h1>
+    <p>Hubungi Urusetia Alumni STS: 07-9312472</p>
   </div>
   <img src="logo_100yrs.png" alt="100 Tahun STS" onerror="this.style.display='none'">
 </header>
@@ -125,11 +113,11 @@
   </div>
 </div>
 
-<footer>© 2026 Sekolah Tinggi Segamat — Tempahan Pakej PLATINUM </footer>
+<footer>© 2026 Sekolah Tinggi Segamat — Tempahan STS100A</footer>
 
 <script>
 /* ---------- CONFIG ---------- */
-const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyXGOn_wQokAD-OQpituR6bjAGDvgh0_TZny2V7Ve4ebQuPvraMeYvVb3IWqk1G6B57/exec";
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw_6S3FbwAx5Odg1UBHhcI4RND7ShBBLZd7Q9yEfRwRzzny-nXIxFEG7JBBebj6P8aIkQ/exec";
 const TENT_MAP = [['A','B','C','D','E'],['F','G','H','I','J']];
 const MEJA_PER_TENT = 4; // arranged 2x2
 const SEATS_PER_TABLE = 8;
@@ -378,6 +366,3 @@ document.addEventListener('DOMContentLoaded', ()=>{
 </script>
 </body>
 </html>
-
-
-
