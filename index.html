@@ -1,125 +1,8 @@
-<!doctype html>
-<html lang="ms">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Tempahan Pakej PLATINUM — Majlis Jamuan Amal 100 Tahun STS</title>
-<style>
-  :root{
-    --header:#0f3b77; --bg:#f7f9fc; --seat-size:32px; --price:180;
-    --booked:#bdbdbd; --selected:#2ecc71;
-    --vvip:#fdf3d7; --vvip-border:#fcd34d;
-    --tent-gap:18px;
-  }
-  *{box-sizing:border-box;font-family:Inter,system-ui,Arial,Helvetica,sans-serif}
-  body{margin:0;background:var(--bg);color:#0f172a}
-  header{background:var(--header);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 18px;justify-content:space-between}
-  header img{height:56px;width:auto}
-  .header-center{flex:1;text-align:center}
-  .header-center h1{margin:2px 0;font-size:18px}
-  .header-center p{margin:0;font-size:13px;opacity:.95}
-  main{max-width:1200px;margin:18px auto;padding:12px}
-  .note{max-width:1200px;margin:0 auto 12px;padding:0 12px;color:#374151;text-align:center}
-  .controls{display:flex;gap:10px;align-items:center;justify-content:center;margin:12px 0;flex-wrap:wrap}
-  button.primary{background:var(--header);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
-  button.ghost{background:#fff;border:1px solid #e6eefc;color:var(--header);padding:9px 12px;border-radius:8px;cursor:pointer}
-
-  /* layout 5 x 2 */
-  .tents-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--tent-gap);align-items:start;margin:12px 0}
-  @media (max-width:1100px){ .tents-grid{grid-template-columns:repeat(2,1fr)} }
-
-  .tent{
-    background:#fff;border-radius:12px;padding:10px;border:4px solid #e6eefc;
-    min-height:260px;display:flex;flex-direction:column;align-items:center;
-  }
-  .tent-name{font-weight:800;margin-bottom:8px}
-  .tent-inner{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;justify-items:center;align-items:center;width:100%}
-  .tent-vvip{background:var(--vvip);border:4px solid var(--vvip-border);}
-
-  /* table card inside tent */
-  .table-slot{width:110px;height:110px;position:relative;border-radius:50%;background:#f9fafb;border:2px solid #e2e8f0;display:flex;align-items:center;justify-content:center}
-  .table-center{width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid #cbd5e1;display:flex;align-items:center;justify-content:center;font-size:12px;z-index:3}
-
-  .seat{position:absolute;width:var(--seat-size);height:var(--seat-size);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;border:1px solid #3b82f6;background:#fff;color:#0f172a;cursor:pointer;user-select:none;transform:translate(-50%,-50%);z-index:2}
-  .seat.booked{background:var(--booked);color:#fff;cursor:not-allowed}
-  .seat.selected{background:var(--selected);color:#fff}
-
-  /* footer */
-  footer{background:var(--header);color:#fff;text-align:center;padding:12px;margin-top:18px}
-
-  /* modal */
-  .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:center;justify-content:center;z-index:999}
-  .modal{width:520px;background:#fff;border-radius:10px;padding:16px;box-shadow:0 10px 40px rgba(2,6,23,.3)}
-  .field{margin-bottom:8px}
-  label{display:block;font-size:13px;margin-bottom:6px}
-  input{width:100%;padding:8px;border-radius:8px;border:1px solid #e6eefc}
-  .invalid-resit{color:#9b1c1c;margin-top:6px;font-weight:700;display:none}
-  @media(max-width:600px){ .modal{width:92%} }
-</style>
-</head>
-<body>
-
-<header>
-  <img src="logo_sts.png" alt="Logo STS" onerror="this.style.display='none'">
-  <div class="header-center">
-    <h1>Tempahan Pakej PLATINUM — Majlis Jamuan Amal 100 Tahun STS</h1>
-    <p>Hubungi Urusetia Alumni STS: 011-55742917(Cg Azlan)/011-21441240(Cg Ajul)</p>
-  </div>
-  <img src="logo_100yrs.png" alt="100 Tahun STS" onerror="this.style.display='none'">
-</header>
-
-<main>
-  <div class="note">Susunan khemah 5 × 2 — Khemah C (VVIP) tidak menerima tempahan. Harga RM180/kerusi. Pilih kerusi, isikan butiran dan sahkan.</div>
-
-  <div class="controls">
-    <button class="primary" id="openBookingBtn">🪑 Buat Tempahan</button>
-    <button class="ghost" id="refreshBtn">🔄 Muat Semula Pelan</button>
-    <button class="ghost" id="downloadBtn">💾 Muat Turun Semua (CSV)</button>
-    <button class="ghost" id="adminBtn">🔒 Paparan Admin</button>
-  </div>
-
-  <div class="tents-grid" id="tentsContainer" aria-live="polite"></div>
-</main>
-
-<!-- Booking modal -->
-<div class="modal-backdrop" id="bookingBackdrop" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true">
-    <h3>Borang Tempahan</h3>
-    <form id="bookingForm">
-      <div class="field"><label>Nama Penuh</label><input id="fName" required></div>
-      <div class="field"><label>No. Telefon</label><input id="fPhone" required></div>
-      <div class="field"><label>Batch / Tahun</label><input id="fBatch" required></div>
-      <div class="field"><label>No. Resit (STS100Axxx)</label><input id="fResit" required placeholder="STS100A001"></div>
-      <div id="resitError" class="invalid-resit">⚠️ Nombor resit tidak sah untuk Pakej A. Sila hubungi urusetia alumni.</div>
-      <div class="field" id="selectedSummary">Tiada kerusi dipilih.</div>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button type="button" class="ghost" id="cancelBooking">Batal</button>
-        <button type="submit" class="primary" id="confirmBooking">Sahkan Tempahan</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Admin modal -->
-<div class="modal-backdrop" id="adminBackdrop" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true">
-    <h3>Paparan Admin</h3>
-    <div class="field"><label>Kata Laluan Admin</label><input id="adminPass" type="password" placeholder="Masukkan kata laluan"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="ghost" id="adminCancel">Tutup</button>
-      <button class="primary" id="adminLogin">Log Masuk</button>
-    </div>
-    <p style="margin-top:8px;font-size:13px;color:#6b7280">(Kata laluan admin: <strong>STSADMIN2025</strong>)</p>
-  </div>
-</div>
-
-<footer>© 2026 Sekolah Tinggi Segamat — Tempahan STS100A</footer>
-
 <script>
 /* ---------- CONFIG ---------- */
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby64_g8vOI_CidHL3QhUExCxcBlMKaxdr_kNeAf8_a-VA59IE6tcwmR6MLzrF4ni-Pk9A/exec';
 const TENT_MAP = [['A','B','C','D','E'],['F','G','H','I','J']];
-const MEJA_PER_TENT = 4; // arranged 2x2
+const MEJA_PER_TENT = 4;
 const SEATS_PER_TABLE = 8;
 const PRICE = 180;
 const ADMIN_PASS = 'STSADMIN2025';
@@ -127,11 +10,10 @@ const ADMIN_PASS = 'STSADMIN2025';
 /* ---------- helpers ---------- */
 const $ = (s, ctx=document) => ctx.querySelector(s);
 
-/* store current selections and server-booked seats */
 let selectedSeats = new Set();
 let serverBooked = new Set();
 
-/* ---------- layout builder (2x2 tables in each tent) ---------- */
+/* ---------- layout builder ---------- */
 function buildTents(){
   const container = $('#tentsContainer');
   container.innerHTML = '';
@@ -142,35 +24,33 @@ function buildTents(){
       tent.innerHTML = `<div class="tent-name">Khemah ${tentName}${tentName==='C' ? ' (VVIP)' : ''}</div>
                         <div class="tent-inner" aria-label="Khemah ${tentName}"></div>`;
       const inner = tent.querySelector('.tent-inner');
-
       if(tentName === 'C'){
         inner.innerHTML = '<div style="grid-column:1/-1;font-size:13px;color:#92400e">Kawasan Tetamu Kehormat — Tiada meja/kerusi</div>';
         container.appendChild(tent);
         continue;
       }
 
-      // place 4 tables in 2x2 grid inside tent-inner
       for(let tableIndex=1; tableIndex<=MEJA_PER_TENT; tableIndex++){
         const table = document.createElement('div');
         table.className = 'table-slot';
         table.dataset.table = tableIndex;
-        // table center label
-        const center = document.createElement('div'); center.className='table-center'; center.textContent = 'T' + tableIndex;
+
+        const center = document.createElement('div');
+        center.className='table-center';
+        center.textContent = 'T' + tableIndex;
         table.appendChild(center);
 
-        // place 8 seats around circle (use percent positions relative to 110x110)
-        const radius = 38; // px relative center (center at 55,55)
-        const cx = 55, cy = 55;
+        const radius = 38, cx = 55, cy = 55;
         for(let s=1; s<=SEATS_PER_TABLE; s++){
           const angle = (s-1) * (2*Math.PI / SEATS_PER_TABLE);
           const x = cx + Math.cos(angle) * radius;
           const y = cy + Math.sin(angle) * radius;
           const seat = document.createElement('div');
           seat.className = 'seat';
-          const seatId = `${tentName}-T${tableIndex}-S${s}`; // A-T1-S1 etc
+          const seatId = `${tentName}-T${tableIndex}-S${s}`;
           seat.style.left = x + 'px';
           seat.style.top  = y + 'px';
-          seat.textContent = `${tentName}${tableIndex}${s}`; // short label e.g. A11
+          seat.textContent = `${tentName}${tableIndex}${s}`;
           seat.title = `Khemah ${tentName} — Meja ${tableIndex} — Kerusi ${s}`;
           seat.dataset.seatid = seatId;
           seat.dataset.tent = tentName;
@@ -179,19 +59,15 @@ function buildTents(){
           seat.addEventListener('click', onSeatClick);
           table.appendChild(seat);
         }
-
         inner.appendChild(table);
       }
-
       container.appendChild(tent);
     }
   }
-
-  // after building, mark server-booked seats and selected seats
   markBookedAndSelected();
 }
 
-/* ---------- mark booked / selected ---------- */
+/* ---------- seat selection ---------- */
 function markBookedAndSelected(){
   document.querySelectorAll('.seat').forEach(el=>{
     const id = el.dataset.seatid;
@@ -218,55 +94,44 @@ function updateSummaryText(){
   else sum.textContent = `Kerusi dipilih: ${Array.from(selectedSeats).join(', ')} — Jumlah RM${selectedSeats.size * PRICE}`;
 }
 
-/* ---------- Load bookings from server (JSONP fallback) ---------- */
+/* ---------- server sync ---------- */
 function handleServerBookings(data){
   serverBooked.clear();
   if(Array.isArray(data)){
     data.forEach(row=>{
-      // server responses may vary; try get khemah/meja/kerusi or kod
       if(row.khemah && row.meja && row.kerusi){
         const sid = `${String(row.khemah)}-T${String(row.meja)}-S${String(row.kerusi)}`;
         serverBooked.add(sid);
-      } else if(row.kodKerusi){
-        serverBooked.add(String(row.kodKerusi));
-      } else if(row.kode || row.kod){
-        // possible variants
-        serverBooked.add(String(row.kod || row.kode));
-      }
+      } else if(row.kodKerusi){ serverBooked.add(String(row.kodKerusi)); }
+      else if(row.kode || row.kod){ serverBooked.add(String(row.kod || row.kode)); }
     });
   }
   markBookedAndSelected();
 }
 
 function loadBookingsFromServer(){
-  // attempt JSONP via action=load (callback=handleServerBookings)
   const cbName = 'handleServerBookings';
   window[cbName] = handleServerBookings;
   const s = document.createElement('script');
   s.src = WEBAPP_URL + '?action=load&callback=' + cbName + '&_=' + Date.now();
-  s.onerror = function(){
-    // fallback: try simple JSON GET (CORS may block, but try)
-    fetch(WEBAPP_URL + '?action=list').then(r=>r.json()).then(d=>handleServerBookings(d)).catch(err=>console.warn('Load bookings failed',err));
-  };
+  s.onerror = ()=> fetch(WEBAPP_URL + '?action=list')
+    .then(r=>r.json()).then(d=>handleServerBookings(d))
+    .catch(err=>console.warn('Load bookings failed',err));
   document.body.appendChild(s);
-  // remove tag later
   setTimeout(()=>{ try{ document.body.removeChild(s); }catch(e){} },15000);
 }
 
-/* ---------- Resit validation (client-side) ---------- */
+/* ---------- resit check ---------- */
 function isValidResit(resit){
   if(!resit) return false;
   const r = resit.trim().toUpperCase();
   if(!r.startsWith('STS100A')) return false;
   const num = r.slice(7);
-  if(!/^\d{3}$/.test(num)) return false;
-  const v = parseInt(num,10);
-  return v >= 1 && v <= 288;
+  return /^\d{3}$/.test(num) && parseInt(num,10) >= 1 && parseInt(num,10) <= 288;
 }
 
-/* ---------- Booking submit (send to server) ---------- */
+/* ---------- booking submit ---------- */
 async function submitBooking(){
-  // basic validation
   if(selectedSeats.size === 0){ alert('Sila pilih sekurang-kurangnya satu kerusi.'); return; }
   const name = $('#fName').value.trim();
   const phone = $('#fPhone').value.trim();
@@ -276,99 +141,49 @@ async function submitBooking(){
   if(!name || !phone || !batch){ alert('Sila lengkapkan Nama, Telefon dan Batch.'); return; }
   if(!isValidResit(resitRaw)){ $('#resitError').style.display='block'; alert('⚠️ Nombor resit tidak sah untuk Pakej A.\nSila hubungi urusetia alumni.'); return; }
 
-  const code = 'STS100-' + Math.random().toString(36).slice(2,9).toUpperCase();
+  const code = 'STS100A-' + Math.random().toString(36).slice(2,9).toUpperCase();
   const seatsArray = Array.from(selectedSeats);
 
-  // send each seat as GET no-cors (server will validate & write); if any fail server-side, it will not be added
   let sentCount = 0;
   for(const seat of seatsArray){
-    const parts = seat.split('-'); // e.g. ['A','T1','S1']
+    const parts = seat.split('-');
     const khemah = parts[0];
     const meja = parts[1].replace('T','');
     const kerusi = parts[2].replace('S','');
-    const payload = {
-      nama: name,
-      telefon: phone,
-      batch: batch,
-      resit: resitRaw,
-      khemah: khemah,
-      meja: meja,
-      kerusi: kerusi,
-      kod_tempahan: code,
-      harga: PRICE,
-      masa: new Date().toISOString()
-    };
-    const params = new URLSearchParams(payload);
-    const url = WEBAPP_URL + '?' + params.toString();
+    const params = new URLSearchParams({
+      nama:name, telefon:phone, batch:batch, resit:resitRaw,
+      khemah:khemah, meja:meja, kerusi:kerusi,
+      kod_tempahan:code, harga:PRICE, masa:new Date().toISOString()
+    });
     try{
-      // no-cors so browser doesn't block UI; server still receives and writes
-      await fetch(url, { method: 'GET', mode: 'no-cors' });
+      await fetch(WEBAPP_URL + '?' + params.toString(), { method:'GET', mode:'no-cors' });
       sentCount++;
-    } catch(err){
-      console.error('Fetch error', err);
-    }
+    }catch(err){ console.error(err); }
   }
 
   if(sentCount > 0){
-    alert(`✅ Data dihantar ke server (${sentCount} kerusi). Menunggu pengesahan server...`);
-    // clear selection locally; refresh server bookings after short delay
-    selectedSeats.clear();
-    updateSummaryText();
-    setTimeout(()=>{ loadBookingsFromServer(); }, 1200);
+    alert(`✅ Tempahan berjaya dihantar (${sentCount} kerusi). Sila tunggu pelan dikemas kini...`);
+    selectedSeats.clear(); updateSummaryText();
     $('#bookingBackdrop').style.display='none';
+    const note = document.querySelector('.note');
+    const oldNote = note.textContent;
+    note.textContent = "🔄 Sedang mengemas kini pelan... sila tunggu sebentar.";
+    setTimeout(()=>{
+      loadBookingsFromServer();
+      note.textContent = oldNote;
+    }, 4000);
   } else {
     alert('⚠️ Gagal menghantar ke server. Sila cuba lagi.');
   }
 }
 
-/* ---------- Admin & export ---------- */
+/* ---------- misc ---------- */
 $('#adminBtn').addEventListener('click', ()=>{ $('#adminBackdrop').style.display='flex'; $('#adminPass').focus(); });
-$('#adminCancel').addEventListener('click', ()=>{ $('#adminBackdrop').style.display='none'; $('#adminPass').value=''; });
-
-$('#adminLogin').addEventListener('click', ()=>{
-  const val = $('#adminPass').value;
-  if(val !== ADMIN_PASS){ alert('Kata laluan admin salah.'); $('#adminPass').value=''; return; }
-  // fetch server bookings via JSONP and show summary
-  const cbName = 'adminCB_' + Date.now();
-  window[cbName] = function(data){
-    if(!Array.isArray(data) || data.length === 0){ alert('Tiada tempahan.'); delete window[cbName]; return; }
-    let msg = 'Ringkasan Tempahan (Server):\\n';
-    data.forEach(b=>{
-      const code = b.kod || b.kod_tempahan || b.kodTempahan || '';
-      msg += `${code} — ${b.nama || b.nama_pemesan || ''} — ${b.khemah||''}${b.meja||''}${b.kerusi||''}\\n`;
-    });
-    alert(msg);
-    delete window[cbName];
-  };
-  const s = document.createElement('script');
-  s.src = WEBAPP_URL + '?action=load&callback=' + cbName + '&_=' + Date.now();
-  document.body.appendChild(s);
-  setTimeout(()=>{ try{ document.body.removeChild(s); }catch(e){} },15000);
-  $('#adminBackdrop').style.display='none'; $('#adminPass').value='';
-});
-
-/* download CSV */
-$('#downloadBtn').addEventListener('click', ()=>{ window.open(WEBAPP_URL + '?action=export', '_blank'); });
-
-/* modal open/close */
+$('#adminCancel').addEventListener('click', ()=>{ $('#adminBackdrop').style.display='none'; });
+$('#refreshBtn').addEventListener('click', ()=> loadBookingsFromServer());
 $('#openBookingBtn').addEventListener('click', ()=>{ $('#bookingBackdrop').style.display='flex'; $('#fName').focus(); updateSummaryText(); });
 $('#cancelBooking').addEventListener('click', ()=>{ $('#bookingBackdrop').style.display='none'; });
-
-$('#refreshBtn').addEventListener('click', ()=>{ loadBookingsFromServer(); });
-
 $('#bookingForm').addEventListener('submit', ev=>{ ev.preventDefault(); submitBooking(); });
 
-/* ---------- init ---------- */
-document.addEventListener('DOMContentLoaded', ()=>{
-  buildTents();
-  loadBookingsFromServer();
-});
+document.addEventListener('DOMContentLoaded', ()=>{ buildTents(); loadBookingsFromServer(); });
 </script>
-</body>
-</html>
-
-
-
-
-
-
